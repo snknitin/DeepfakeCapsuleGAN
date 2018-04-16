@@ -19,7 +19,7 @@ def save_fig(fig_id, tight_layout=True, fig_extension="png", resolution=300):
         plt.tight_layout()
     plt.savefig(path, format=fig_extension, dpi=resolution)
 
-def save_imgs(dataset_title,generator, epoch):
+def save_imgs(dataset_title,generator, epoch,hps):
     r, c = 5, 5
     noise = np.random.normal(0, 1, (r * c, 100))
     gen_imgs = generator.predict(noise)
@@ -43,9 +43,10 @@ def save_imgs(dataset_title,generator, epoch):
                 cnt += 1
             else:
                 print('Please indicate the image options.')
+    path = os.path.join(hps.module_dir, 'images_{}_{}'.format(dataset_title))
+    if not os.path.exists(path):
+        os.makedirs(path)
 
-
-    path = os.path.join(IMAGES_PATH, 'images_{0}'.format(dataset_title))
     fig.savefig(path)
     plt.close()
 
