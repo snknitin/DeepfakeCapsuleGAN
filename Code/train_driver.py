@@ -10,6 +10,7 @@ import math
 import tensorflow as tf
 import numpy as np
 from keras import Model, Input
+from keras.optimizers import Adam
 from tensorflow.python.client import timeline
 from tensorflow.python.framework import test_util
 import shared_utils as su
@@ -18,7 +19,8 @@ import tf_lib
 import model_base as mb
 from datetime import datetime
 from sklearn.externals import joblib
-
+# import ujson
+import pickle
 
 def get_hps(base_dir, data_dir):
   hps= tf_lib.HParams(
@@ -54,10 +56,15 @@ def train(hps, epochs, save_interval=1000):
     model=mb.CapsuleGANModel(hps,shape)
     discriminator = model.build_discriminator()
     generator = model.build_generator()
+    discriminator.compile(loss='binary_crossentropy', optimizer=Adam(hps.learning_rate,hps.beta_1,hps.beta_2,hps.epsilon), metrics=['accuracy'])
+    generator.compile(loss='binary_crossentropy', optimizer=Adam(hps.learning_rate,hps.beta_1,hps.beta_2,hps.epsilon))
+
     z = Input(shape=(100,))
     img = generator(z)
+    discriminator.trainable = False
     valid = discriminator(img)
     combined = Model(z, valid)
+    combined.compile(loss='binary_crossentropy', optimizer=Adam(hps.learning_rate,hps.beta_1,hps.beta_2,hps.epsilon))
     for epoch in range(epochs):
 
         # ---------------------
@@ -101,9 +108,12 @@ def train(hps, epochs, save_interval=1000):
 
         # if at save interval => save generated image samples
         if epoch % (5*save_interval) == 0:
-            su.save_imgs(hps.module, epoch,hps)
+            su.save_imgs(hps.module,generator, epoch,hps)
         if epoch % (10*save_interval) == 0:
             generator.save(hps.module+'_gen_model_{}.h5'.format(epoch))
             discriminator.save(hps.module+'_dis_model_{}.h5'.format(epoch))
         if epoch % (15*save_interval) == 0:
-            joblib.dump(model, "model.pkl")
+            joblib.dump(model, "model_{}.pkl".format(epoch))
+            # with open("model_{}.json".format(epoch), 'w') as f:
+            #     pickle.dump(model, f,protocol=pickle.HIGHEST_PROTOCOL)
+            # f.close()
