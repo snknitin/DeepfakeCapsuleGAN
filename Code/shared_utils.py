@@ -2,9 +2,9 @@ import os
 import pandas as pd
 import numpy as np
 from keras import backend as K
-import skimage
-from skimage import data, color, exposure
-from skimage.transform import resize
+# import skimage
+# from skimage import data, color, exposure
+# from skimage.transform import resize
 import matplotlib.pyplot as plt
 
 
@@ -63,9 +63,3 @@ def squash(vectors, axis=-1):
     return scale * vectors
 
 
-def load():
-    """
-    Loads the dataset
-    """
-    # step 1: Load the data and include column headers
-    pass
