@@ -1,24 +1,33 @@
 import os
 from time import time
 import pandas as pd
-
-class Solution(object):
-    def __init__(self):
-
-        self.X_train,self.X_test,self.y_train,self.y_test,self.dataframe_all=None,None,None,None
-
-    def visualize(self):
-        pass
-
-    def train_generator(self):
-    	pass
-
-    def train_discriminator(self):
-        pass
-
-    
-
-if __name__=="__main__":
-    s=Solution()
+import numpy as np
+from keras.datasets import mnist, cifar10
 
 
+def load_dataset(hps):
+    if hps.module == 'mnist':
+        width, height, channels=hps.train_mnist_dimensions
+
+        # load MNIST data
+        (X_train, y_train), (X_test, y_test) = mnist.load_data()
+
+        # rescale -1 to 1
+        X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+        X_train = np.expand_dims(X_train, axis=3)
+
+    if hps.module == 'cifar10':
+        # load CIFAR10 data
+        width, height, channels = hps.train_mnist_dimensions
+        (X_train, y_train), (X_test, y_test) = cifar10.load_data()
+
+        # rescale -1 to 1
+        X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+
+    # defining input dims
+    img_rows = width
+    img_cols = height
+    channels = channels
+    img_shape = [img_rows, img_cols, channels]
+
+    return X_train, img_shape
