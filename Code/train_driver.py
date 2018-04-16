@@ -19,8 +19,9 @@ import tf_lib
 import model_base as mb
 from datetime import datetime
 from sklearn.externals import joblib
-# import ujson
+import ujson
 import pickle
+import matplotlib.pyplot as plt
 
 def get_hps(base_dir, data_dir):
   hps= tf_lib.HParams(
@@ -112,8 +113,21 @@ def train(hps, epochs, save_interval=1000):
         if epoch % (10*save_interval) == 0:
             generator.save(hps.module+'_gen_model_{}.h5'.format(epoch))
             discriminator.save(hps.module+'_dis_model_{}.h5'.format(epoch))
-        if epoch % (15*save_interval) == 0:
-            joblib.dump(model, "model_{}.pkl".format(epoch))
-            # with open("model_{}.json".format(epoch), 'w') as f:
-            #     pickle.dump(model, f,protocol=pickle.HIGHEST_PROTOCOL)
-            # f.close()
+        # if epoch % (15*save_interval) == 0:
+        #     # joblib.dump(model, "model_{}.pkl".format(epoch))
+        #     with open("model_{}.json".format(epoch), 'w') as f:
+        #         ujson.dump(model, f)
+        #     f.close()
+    plt.plot(model.D_L)
+    plt.title('Discriminator results')
+    plt.xlabel('Epochs')
+    plt.ylabel('Discriminator Loss (blue), Discriminator Accuracy (orange)')
+    plt.legend(['Discriminator Loss', 'Discriminator Accuracy'])
+    su.save_fig("{}_DL".format(hps.module))
+
+    plt.plot(model.G_L)
+    plt.title('Generator results')
+    plt.xlabel('Epochs')
+    plt.ylabel('Generator Loss (blue)')
+    plt.legend('Generator Loss')
+    su.save_fig("{}_GL".format(hps.module))
