@@ -9,28 +9,25 @@ import time
 import math
 import tensorflow as tf
 import numpy as np
+from keras import Model, Input
 from tensorflow.python.client import timeline
 from tensorflow.python.framework import test_util
 import shared_utils as su
 import data
 import tf_lib
+import model_base as mb
 from datetime import datetime
+from sklearn.externals import joblib
 
 
 def get_hps(base_dir, data_dir):
   hps= tf_lib.HParams(
       init_scale=0.08,
-      learning_rate=1e-5,
+      learning_rate=2e-4,
       epsilon=1e-4,  # epsilon for Adam optimizer
-      max_grad_norm=2.0,
-      max_epoch=2,
-      max_iters=4,
-      max_max_epoch=13,
-      hidden_size=512,
+      beta_1=0.9,
+      beta_2=0.999,
       batch_size=64,
-      pass_lstm_states=True,
-      use_separate_embeddings=False,
-      use_separate_encoders=False,
       use_gpu=True,
       round_robin_gpu=True,
       max_gpus=4,
@@ -42,20 +39,71 @@ def get_hps(base_dir, data_dir):
 
   )
 
-
-  hps.train_mnist_files_path = os.path.join(data_dir, "train/train_mnist/")
-  hps.train_cifar_files_path = os.path.join(data_dir, "train/train_cifar/")
-  hps.train_celeba_files_path = os.path.join(data_dir, "train/train_celeba/")
-
-  hps.dev_mnist_files_path = os.path.join(data_dir, "dev/dev_mnist/")
-  hps.dev_cifar_files_path = os.path.join(data_dir, "dev/dev_cifar/")
-  hps.dev_celeba_files_path = os.path.join(data_dir, "dev/dev_celeba/")
-
-  hps.eval_mnist_files_path = os.path.join(data_dir, "eval/eval_mnist/")
-  hps.eval_cifar_files_path = os.path.join(data_dir, "eval/eval_cifar/")
-  hps.eval_celeba_files_path = os.path.join(data_dir, "eval/eval_celeba/")
-
+  hps.train_mnist_dimensions = (28,28,1)
+  hps.train_cifar_dimensions = (32,32,3)
+  hps.train_celeba_dimensions = (32,32,3)
 
   return hps
 
 
+def train(hps, epochs, save_interval=1000):
+    half_batch = int(hps.batch_size / 2)
+    dataset, shape = data.load_dataset(hps.module)
+    # loss values for further plotting
+
+    model=mb.CapsuleGANModel(hps,shape)
+    discriminator = model.build_discriminator()
+    generator = model.build_generator()
+    z = Input(shape=(100,))
+    img = generator(z)
+    valid = discriminator(img)
+    combined = Model(z, valid)
+    for epoch in range(epochs):
+
+        # ---------------------
+        #  Train Discriminator
+        # ---------------------
+
+        # select a random half batch of images
+        idx = np.random.randint(0, dataset.shape[0], half_batch)
+        imgs = dataset[idx]
+
+        noise = np.random.normal(0, 1, (half_batch, 100))
+
+        # generate a half batch of new images
+        gen_imgs = generator.predict(noise)
+
+        # train the discriminator by feeding both real and fake (generated) images one by one
+        d_loss_real = discriminator.train_on_batch(imgs, np.ones((half_batch, 1)) * 0.9)  # 0.9 for label smoothing
+        d_loss_fake = discriminator.train_on_batch(gen_imgs, np.zeros((half_batch, 1)))
+        d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
+
+        # ---------------------
+        #  Train Generator
+        # ---------------------
+
+        noise = np.random.normal(0, 1, (hps.batch_size, 100))
+
+        # the generator wants the discriminator to label the generated samples
+        # as valid (ones)
+        valid_y = np.array([1] * hps.batch_size)
+
+        # train the generator
+        g_loss = combined.train_on_batch(noise, np.ones((hps.batch_size, 1)))
+
+        # Plot the progress
+        print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss))
+        model.D_L_REAL.append(d_loss_real)
+        model.D_L_FAKE.append(d_loss_fake)
+        model.D_L.append(d_loss)
+        model.D_ACC.append(d_loss[1])
+        model.G_L.append(g_loss)
+
+        # if at save interval => save generated image samples
+        if epoch % (5*save_interval) == 0:
+            su.save_imgs(hps.module, epoch,hps)
+        if epoch % (10*save_interval) == 0:
+            generator.save(hps.module+'_gen_model_{}.h5'.format(epoch))
+            discriminator.save(hps.module+'_dis_model_{}.h5'.format(epoch))
+        if epoch % (15*save_interval) == 0:
+            joblib.dump(model, "model.pkl")
