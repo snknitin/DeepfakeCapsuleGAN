@@ -17,7 +17,7 @@ from keras.layers import BatchNormalization, Activation, ZeroPadding2D
 from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
-from keras.optimizers import Adam
+
 from keras.preprocessing.image import ImageDataGenerator
 from keras import callbacks
 import sys
