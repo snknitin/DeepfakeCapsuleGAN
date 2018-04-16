@@ -48,7 +48,7 @@ def get_hps(base_dir, data_dir):
 
 def train(hps, epochs, save_interval=1000):
     half_batch = int(hps.batch_size / 2)
-    dataset, shape = data.load_dataset(hps.module)
+    dataset, shape = data.load_dataset(hps)
     # loss values for further plotting
 
     model=mb.CapsuleGANModel(hps,shape)
