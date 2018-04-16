@@ -24,7 +24,7 @@ tf.app.flags.DEFINE_string('base_dir', '', """Base directory to work out of and 
 tf.app.flags.DEFINE_string('data_dir', '', """Base directory to from which to read data.""")
 
 # Important settings
-tf.app.flags.DEFINE_string('module', 'mnist', 'must be one of mnist,cifar/celeba')
+tf.app.flags.DEFINE_string('module', 'mnist', 'must be one of mnist/cifar10/celeba')
 tf.app.flags.DEFINE_string('mode', 'train', 'must be one of train/val/test')
 # Where to save output
 tf.app.flags.DEFINE_string('log_root', '', 'Root directory for all logging.')
@@ -32,7 +32,7 @@ tf.app.flags.DEFINE_string('exp_name', '', 'Name for experiment. Logs will be sa
 
 
 tf.app.flags.DEFINE_integer('random_seed', 1337, """Random seed for all RNGs (python, tensorflow, numpy).""")
-tf.app.flags.DEFINE_integer('num_epochs', '100', 'Number of epochs in the training')
+tf.app.flags.DEFINE_integer('num_epochs', '30000', 'Number of epochs in the training')
 
 
 
@@ -52,10 +52,7 @@ def main(unused_argv):
     tf.logging.set_verbosity(tf.logging.INFO)  # choose what level of logging you want
     tf.logging.info('Starting capsule gan in %s mode...', (FLAGS.mode))
 
-    mode_modules = {
-        "mnist": td.mnist,
-        "cifar": td.cifar,
-        "celeba":td.celeba}
+
     # Change log_root to FLAGS.log_root/FLAGS.exp_name and create the dir if necessary
     FLAGS.log_root = os.path.join(FLAGS.log_root, FLAGS.exp_name)
     if not os.path.exists(FLAGS.log_root):
@@ -72,20 +69,16 @@ def main(unused_argv):
 
     hps = td.get_hps(FLAGS.base_dir, FLAGS.data_dir)
     hps.mode= FLAGS.mode
+    hps.module=FLAGS.module
     hps.module_dir=module_dir
+    hps.num_epochs=FLAGS.num_epochs
 
 
-    tf.logging.info('Reading from vocabulary file...')
+    tf.logging.info('Loading the model...')
 
     # Call the model
-    if FLAGS.module in mode_modules:
-        print("Module: ",FLAGS.module)
-        print("Mode: ",FLAGS.mode)
-        module = mode_modules[FLAGS.module]
-        module(hps)
+    td.train(hps,FLAGS.num_epochs)
 
-    else:
-        raise ValueError("Unknown mode: %s" % FLAGS.mode)
 
 
 if __name__ == '__main__':
