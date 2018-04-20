@@ -21,8 +21,10 @@ from datetime import datetime
 from sklearn.externals import joblib
 import ujson
 import pickle
-import matplotlib.pyplot as plt
+import matplotlib
 matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 
 def get_hps(base_dir, data_dir):
   hps= tf_lib.HParams(
