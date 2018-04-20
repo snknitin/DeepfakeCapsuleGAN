@@ -14,6 +14,7 @@ import tensorflow as tf
 import numpy as np
 import random
 import train_driver as td
+import scorer as sc
 
 
 FLAGS = tf.app.flags.FLAGS
@@ -78,6 +79,7 @@ def main(unused_argv):
 
     # Call the model
     td.train(hps,FLAGS.num_epochs)
+    sc.test(hps)
 
 
 

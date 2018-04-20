@@ -22,6 +22,7 @@ from sklearn.externals import joblib
 import ujson
 import pickle
 import matplotlib.pyplot as plt
+matplotlib.use('Agg')
 
 def get_hps(base_dir, data_dir):
   hps= tf_lib.HParams(
@@ -49,7 +50,7 @@ def get_hps(base_dir, data_dir):
   return hps
 
 
-def train(hps, epochs, save_interval=1000):
+def train(hps, epochs, save_interval=200):
     half_batch = int(hps.batch_size / 2)
     dataset, shape = data.load_dataset(hps)
     # loss values for further plotting
@@ -131,3 +132,5 @@ def train(hps, epochs, save_interval=1000):
     plt.ylabel('Generator Loss (blue)')
     plt.legend('Generator Loss')
     su.save_fig("{}_GL".format(hps.module))
+
+
