@@ -18,7 +18,7 @@ def load_dataset(hps):
 
     if hps.module == 'cifar10':
         # load CIFAR10 data
-        width, height, channels = hps.train_mnist_dimensions
+        width, height, channels = hps.train_cifar_dimensions
         (X_train, y_train), (X_test, y_test) = cifar10.load_data()
 
         # rescale -1 to 1
