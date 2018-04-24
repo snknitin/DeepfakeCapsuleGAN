@@ -114,8 +114,8 @@ def train(hps, epochs, save_interval=200):
         if epoch % (5*save_interval) == 0:
             su.save_imgs(hps.module,generator, epoch,hps)
         if epoch % (10*save_interval) == 0:
-            generator.save(hps.module+'_gen_model_{}.h5'.format(epoch))
-            discriminator.save(hps.module+'_dis_model_{}.h5'.format(epoch))
+            generator.save(os.path.join(hps.model_dir,hps.module+'_gen_model_{}.h5'.format(epoch)))
+            discriminator.save(os.path.join(hps.model_dir,hps.module+'_dis_model_{}.h5'.format(epoch)))
         # if epoch % (15*save_interval) == 0:
         #     # joblib.dump(model, "model_{}.pkl".format(epoch))
         #     with open("model_{}.json".format(epoch), 'w') as f:
