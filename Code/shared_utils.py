@@ -43,7 +43,7 @@ def save_imgs(dataset_title,generator, epoch,hps):
                 cnt += 1
             else:
                 print('Please indicate the image options.')
-    path = os.path.join(hps.module_dir, 'images_{}_{}'.format(dataset_title,epoch))
+    path = os.path.join(hps.img_dir, 'images_{}_{}'.format(dataset_title,epoch))
     # if not os.path.exists(path):
     #     os.makedirs(path)
 

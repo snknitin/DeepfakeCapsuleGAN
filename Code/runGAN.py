@@ -61,11 +61,13 @@ def main(unused_argv):
 
     module_dir = os.path.join(FLAGS.log_root, FLAGS.module)  # make a subdir of the root dir for chosen module data
     model_dir= os.path.join(module_dir,"saved_models")
+    img_dir = os.path.join(module_dir, "img")
     # Create directory for module only after running in train mode
     if not os.path.exists(module_dir):
         if FLAGS.mode=="train":
           os.makedirs(module_dir)
           os.makedirs(model_dir)
+          os.makedirs(img_dir)
         else:
           raise Exception("Module directory doesn't exist in %s . Run in train mode to create it." % (FLAGS.log_root))
 
@@ -74,6 +76,7 @@ def main(unused_argv):
     hps.module=FLAGS.module
     hps.module_dir=module_dir
     hps.model_dir=model_dir
+    hps.img_dir=img_dir
     hps.num_epochs=FLAGS.num_epochs
 
 
@@ -81,7 +84,7 @@ def main(unused_argv):
 
     # Call the model
     td.train(hps,FLAGS.num_epochs)
-    sc.test(hps)
+    #sc.test(hps)
 
 
 
