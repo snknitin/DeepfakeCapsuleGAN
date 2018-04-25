@@ -6,6 +6,8 @@ import parmap
 import argparse
 import numpy as np
 from tqdm import tqdm as tqdm
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pylab as plt
 
 
