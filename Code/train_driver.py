@@ -47,7 +47,7 @@ def get_hps(base_dir, data_dir):
 
   hps.train_mnist_dimensions = (28,28,1)
   hps.train_cifar_dimensions = (32,32,3)
-  hps.train_celeba_dimensions = (32,32,3)
+  hps.train_celeba_dimensions = (64,64,3)
 
   return hps
 

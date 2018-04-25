@@ -5,6 +5,13 @@ import numpy as np
 from keras.datasets import mnist, cifar10
 
 
+
+
+
+
+
+
+
 def load_dataset(hps):
     if hps.module == 'mnist':
         width, height, channels=hps.train_mnist_dimensions
@@ -23,6 +30,14 @@ def load_dataset(hps):
 
         # rescale -1 to 1
         X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+
+    if hps.module == 'celeba':
+        # load CelebA data
+        width, height, channels = hps.train_celeba_dimensions
+        (X_train, y_train), (X_test, y_test) = celeba.load_data()
+        # rescale -1 to 1
+        X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+
 
     # defining input dims
     img_rows = width
