@@ -121,14 +121,7 @@ class CapsuleGANModel(object):
         #
         # digitcaps are here
         #
-        """
-        NOTE: My approach is a simplified version of digitcaps i.e. without expanding dimensions into
-        [None, 1, input_n_vectors, input_dim_capsule (feature maps)]
-        and tiling it into [None, num_capsule, input_n_vectors, input_dim_capsule (feature maps)].
-        Instead I replace it with ordinary Keras Dense layers as weight holders in the following lines.
-    
-        ANY CORRECTIONS ARE APPRECIATED IN THIS PART, PLEASE SUBMIT PULL REQUESTS!
-        """
+        
         x = Flatten()(x)
         # capsule (i) in a lower-level layer needs to decide how to send its output vector to higher-level capsules (j)
         # it makes this decision by changing scalar weight (c=coupling coefficient) that will multiply its output vector and then be treated as input to a higher-level capsule
