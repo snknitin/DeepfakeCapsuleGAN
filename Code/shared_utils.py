@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
+import h5py
 from keras import backend as K
 # import skimage
 # from skimage import data, color, exposure
@@ -63,3 +64,19 @@ def squash(vectors, axis=-1):
     return scale * vectors
 
 
+def load_data():
+    """
+    Loads the CelebA dataset from the hdf5 file and processes it
+    :return:
+    """
+
+    with h5py.File(os.path.join(os.path.dirname(os.getcwd()),"Data/celebA/CelebA_32_data.h5"), "r") as hf:
+        # Loading the data as floats
+        X_real_train = hf["data"][:].astype(np.float32)
+        # Transpose to make channels the last dimension
+        X_real_train = X_real_train.transpose(0, 2, 3, 1)
+        # Normalizing the pixels
+        X_real_train = (X_real_train- 127.5) / 127.5
+        np.random.shuffle(X_real_train)
+        # Split to 80%
+        return X_real_train[:162080]

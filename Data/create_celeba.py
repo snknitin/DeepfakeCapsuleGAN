@@ -93,7 +93,7 @@ if __name__ == '__main__':
                         help='Plot the images to make sure the data processing went OK')
     args = parser.parse_args()
 
-    data_dir = "../../data/processed"
+    data_dir = os.path.join(os.getcwd(),"celebA/")
 
     build_HDF5(args.jpeg_dir, size=args.img_size)
 
