@@ -121,7 +121,7 @@ class CapsuleGANModel(object):
         #
         # digitcaps are here
         #
-        
+
         x = Flatten()(x)
         # capsule (i) in a lower-level layer needs to decide how to send its output vector to higher-level capsules (j)
         # it makes this decision by changing scalar weight (c=coupling coefficient) that will multiply its output vector and then be treated as input to a higher-level capsule
