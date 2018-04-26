@@ -42,6 +42,10 @@ def save_imgs(dataset_title,generator, epoch,hps):
                 axs[i, j].imshow(gen_imgs[cnt, :, :, :])
                 axs[i, j].axis('off')
                 cnt += 1
+            elif dataset_title == 'celeba':
+                axs[i, j].imshow(gen_imgs[cnt, :, :, :])
+                axs[i, j].axis('off')
+                cnt += 1
             else:
                 print('Please indicate the image options.')
     path = os.path.join(hps.img_dir, 'images_{}_{}'.format(dataset_title,epoch))
