@@ -9,12 +9,10 @@ from keras import backend as K
 import matplotlib.pyplot as plt
 
 
-IMAGES_PATH=os.path.join(os.getcwd(),"static/")
-if not os.path.exists(IMAGES_PATH):
-        os.makedirs(IMAGES_PATH)
 
-def save_fig(fig_id, tight_layout=True, fig_extension="png", resolution=300):
-    path = os.path.join(IMAGES_PATH, fig_id + "." + fig_extension)
+
+def save_fig(save_path,fig_id, tight_layout=True, fig_extension="png", resolution=300):
+    path = os.path.join(save_path, fig_id + "." + fig_extension)
     print("Saving figure", fig_id)
     if tight_layout:
         plt.tight_layout()
@@ -88,7 +86,9 @@ def load_data():
 
 
 def save_gen_img(dataset_title,generator,num_images):
-
+    IMAGES_PATH = os.path.join(os.path.join(os.path.dirname(os.getcwd()),"Data/"), "static/{}".format(dataset_title))
+    if not os.path.exists(IMAGES_PATH):
+        os.makedirs(IMAGES_PATH)
     cnt=0
     while cnt<num_images:
 
@@ -98,23 +98,23 @@ def save_gen_img(dataset_title,generator,num_images):
             gen_imgs = generator.predict(noise)
             gen_imgs = 0.5 * gen_imgs + 0.5
             plt.imshow(gen_imgs[1, :, :, 0], cmap='gray')
-            save_fig("mnist_gen_{}".format(cnt))
+            save_fig(IMAGES_PATH,"mnist_gen_{}".format(cnt))
             cnt += 1
         elif dataset_title == 'cifar10':
             # rescale images 0 - 1
             noise = np.random.normal(0, 1, (32,100))
             gen_imgs = generator.predict(noise)
             gen_imgs = 0.5 * gen_imgs + 0.5
-            plt.imshow(gen_imgs)
-            save_fig("cifar10_gen_{}".format(cnt))
+            plt.imshow(gen_imgs[1, :, :, :])
+            save_fig(IMAGES_PATH,"cifar10_gen_{}".format(cnt))
             cnt += 1
         elif dataset_title == 'celeba':
             # rescale images 0 - 1
             noise = np.random.normal(0, 1, (32,100))
             gen_imgs = generator.predict(noise)
             gen_imgs = 0.5 * gen_imgs + 0.5
-            plt.imshow(gen_imgs)
-            save_fig("celeba_gen_{}".format(cnt))
+            plt.imshow(gen_imgs[1, :, :, :])
+            save_fig(IMAGES_PATH,"celeba_gen_{}".format(cnt))
             cnt += 1
         else:
             print('Please indicate the image options.')
