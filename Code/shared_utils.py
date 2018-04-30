@@ -18,7 +18,8 @@ def save_fig(fig_id, tight_layout=True, fig_extension="png", resolution=300):
     print("Saving figure", fig_id)
     if tight_layout:
         plt.tight_layout()
-    plt.savefig(path, format=fig_extension, dpi=resolution)
+    plt.axis('off')
+    plt.savefig(path,transparent = True, bbox_inches = 'tight', pad_inches =-0.1, format=fig_extension, dpi=resolution)
 
 def save_imgs(dataset_title,generator, epoch,hps):
     r, c = 5, 5
@@ -84,3 +85,36 @@ def load_data():
         np.random.shuffle(X_real_train)
         # Split to 80%
         return X_real_train[:162080]
+
+
+def save_gen_img(dataset_title,generator,num_images):
+
+    cnt=0
+    while cnt<num_images:
+
+        if dataset_title == 'mnist':
+            # rescale images 0 - 1
+            noise = np.random.normal(0, 1, (32,100))
+            gen_imgs = generator.predict(noise)
+            gen_imgs = 0.5 * gen_imgs + 0.5
+            plt.imshow(gen_imgs[1, :, :, 0], cmap='gray')
+            save_fig("mnist_gen_{}".format(cnt))
+            cnt += 1
+        elif dataset_title == 'cifar10':
+            # rescale images 0 - 1
+            noise = np.random.normal(0, 1, (32,100))
+            gen_imgs = generator.predict(noise)
+            gen_imgs = 0.5 * gen_imgs + 0.5
+            plt.imshow(gen_imgs)
+            save_fig("cifar10_gen_{}".format(cnt))
+            cnt += 1
+        elif dataset_title == 'celeba':
+            # rescale images 0 - 1
+            noise = np.random.normal(0, 1, (32,100))
+            gen_imgs = generator.predict(noise)
+            gen_imgs = 0.5 * gen_imgs + 0.5
+            plt.imshow(gen_imgs)
+            save_fig("celeba_gen_{}".format(cnt))
+            cnt += 1
+        else:
+            print('Please indicate the image options.')
