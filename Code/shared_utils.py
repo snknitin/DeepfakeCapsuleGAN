@@ -7,6 +7,7 @@ from keras import backend as K
 # from skimage import data, color, exposure
 # from skimage.transform import resize
 import matplotlib.pyplot as plt
+from matplotlib import gridspec
 
 
 
@@ -118,3 +119,53 @@ def save_gen_img(dataset_title,generator,num_images):
             cnt += 1
         else:
             print('Please indicate the image options.')
+
+
+def save_gen_imgs(dataset_title,generator):
+    r, c = 10, 10
+    noise = np.random.normal(0, 1, (r * c, 100))
+    gen_imgs = generator.predict(noise)
+    IMAGES_PATH = os.path.join(os.path.join(os.path.dirname(os.getcwd()), "Data/"), "static/{}".format(dataset_title))
+    if not os.path.exists(IMAGES_PATH):
+        os.makedirs(IMAGES_PATH)
+    # rescale images 0 - 1
+    gen_imgs = 0.5 * gen_imgs + 0.5
+
+    fig, axs = plt.subplots(r, c)
+    cnt = 0
+    gs = gridspec.GridSpec(r, c, width_ratios=[1,1,1,1,1,1,1,1,1,1],
+                           wspace=0.0, hspace=0.0, top=0.95, bottom=0.05, left=0.17, right=0.845)
+
+    # iterate in order to create a subplot
+    for i in range(r):
+        for j in range(c):
+            if dataset_title == 'mnist':
+                axs[i, j].imshow(gen_imgs[cnt, :, :, 0], cmap='gray')
+                axs[i, j].axis('off')
+                axs[i, j].set_xticklabels([])
+                axs[i, j].set_yticklabels([])
+                axs[i, j].set_aspect('equal')
+                cnt += 1
+            elif dataset_title == 'cifar10':
+                axs[i, j].imshow(gen_imgs[cnt, :, :, :])
+                axs[i, j].axis('off')
+                axs[i, j].set_xticklabels([])
+                axs[i, j].set_yticklabels([])
+                axs[i, j].set_aspect('equal')
+                cnt += 1
+            elif dataset_title == 'celeba':
+                axs[i, j].imshow(gen_imgs[cnt, :, :, :])
+                axs[i, j].axis('off')
+                axs[i, j].set_xticklabels([])
+                axs[i, j].set_yticklabels([])
+                axs[i, j].set_aspect('equal')
+                cnt += 1
+            else:
+                print('Please indicate the image options.')
+    path = os.path.join(IMAGES_PATH, 'final_images_{}'.format(dataset_title))
+    # if not os.path.exists(path):
+    #     os.makedirs(path)
+    #plt.tight_layout()
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
+    fig.savefig(path, bbox_inches = 'tight', pad_inches =0.0,dpi=300)
+    plt.close()
