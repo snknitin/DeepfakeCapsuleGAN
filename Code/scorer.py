@@ -3,41 +3,25 @@ from __future__ import division
 from __future__ import print_function
 
 import os.path
-import sys
-import tarfile
-
-import numpy as np
-from six.moves import urllib
-import tensorflow as tf
 from tqdm import tqdm
-import glob
-import scipy.misc
-import math
-import sys
-
-import skimage
-from skimage import data, color, exposure
-from skimage.transform import resize
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 # Code derived from tensorflow/tensorflow/models/image/imagenet/classify_image.py
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+
 
 import os.path
-import sys
 import tarfile
 
 import numpy as np
 from six.moves import urllib
 import tensorflow as tf
 import glob
-import scipy.misc
+
 import math
 import sys
+
+
+
 
 MODEL_DIR = '/tmp/imagenet'
 DATA_URL = 'http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz'
@@ -46,7 +30,7 @@ softmax = None
 
 # Call this function with list of images. Each of elements should be a
 # numpy array with values ranging from 0 to 255.
-def get_inception_score(images, splits=10):
+def get_inception_score(images, splits=5):
     assert (type(images) == list)
     assert (type(images[0]) == np.ndarray)
     assert (len(images[0].shape) == 3)
@@ -114,9 +98,9 @@ def _init_inception():
                         new_shape.append(None)
                     else:
                         new_shape.append(s)
-                o._shape = tf.TensorShape(new_shape)
+                o.set_shape = tf.TensorShape(new_shape)
         w = sess.graph.get_operation_by_name("softmax/logits/MatMul").inputs[1]
-        logits = tf.matmul(tf.squeeze(pool3), w)
+        logits = tf.matmul(tf.squeeze(pool3,axis=[0,1]),w)
         softmax = tf.nn.softmax(logits)
 
 
@@ -126,10 +110,21 @@ if __name__ == '__main__':
 
 
     def get_images(filename):
-        return scipy.misc.imread(filename)
+        return plt.imread(filename)
 
 
-    filenames = glob.glob(os.path.join('./data', '*.*'))
-    images = [get_images(filename) for filename in filenames]
+    filenames = glob.glob(os.path.join('E:\\GIT_ROOT\\DeepfakeCapsuleGAN\\Data\\static\\cifar10\\', '*.*'))
+    images = [127.5+127.5*get_images(filename) for filename in filenames]
+
     print(len(images))
+
+    # X_cifar10 = []
+    #
+    # cifar10_imgs = glob.glob("E:\\GIT_ROOT\\DeepfakeCapsuleGAN\\Data\\static\\cifar10\\*.png")
+    # load CIFAR10 sample images
+    # for img in tqdm(cifar10_imgs):
+    #     img = skimage.io.imread(img)[:, :, :3]
+    #     X_cifar10.append(resize(img, (32, 32, 3)))
+
+    # plt.imshow(X_cifar10[0])
     print(get_inception_score(images))
